@@ -1,0 +1,26 @@
+{% set size = size|default('normal') %}
+{% set subtitle = subtitle|default(null) %}
+
+<div class="user-badge user-badge-{{ size }}">
+    <a href="{{ path('app_profile_show', {id: user.id}) }}" class="avatar-link">
+        {% if user.avatarFilename %}
+            <img
+                src="{{ asset('uploads/avatars/' ~ user.avatarFilename) }}"
+                alt="{{ user.displayName }}"
+                class="avatar avatar-{{ size }}"
+            >
+        {% else %}
+            <span class="avatar avatar-{{ size }} avatar-placeholder">
+                {{ user.displayName|slice(0, 1)|upper }}
+            </span>
+        {% endif %}
+    </a>
+
+    <div class="user-badge-text">
+        <a href="{{ path('app_profile_show', {id: user.id}) }}" class="user-name">{{ user.displayName }}</a>
+
+        {% if subtitle %}
+            <div class="meta-text">{{ subtitle }}</div>
+        {% endif %}
+    </div>
+</div>

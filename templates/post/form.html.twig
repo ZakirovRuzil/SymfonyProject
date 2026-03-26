@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ pageTitle }}{% endblock %}
+
+{% block body %}
+    <div class="page-head">
+        <div>
+            <p class="breadcrumbs">
+                <a href="{{ path('app_home') }}">Разделы</a>
+                /
+                <a href="{{ path('app_section_show', {id: section.id}) }}">{{ section.name }}</a>
+            </p>
+            <h1>{{ pageTitle }}</h1>
+        </div>
+    </div>
+
+    <div class="content-wide">
+        {{ form_start(postForm, {attr: {class: 'form-card'}}) }}
+            {{ form_row(postForm.text) }}
+            {{ form_row(postForm.imageFiles) }}
+
+            {% if post.id and post.images is not empty %}
+                <div class="form-help-block">
+                    <div class="meta-label">Текущие изображения</div>
+                    <div class="image-strip">
+                        {% for image in post.images %}
+                            <img src="{{ asset('uploads/post-images/' ~ image.filename) }}" alt="{{ image.originalName }}" class="preview-image">
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="form-actions">
+                <button class="button" type="submit">Сохранить</button>
+                <a class="button button-light" href="{{ path('app_section_show', {id: section.id}) }}">Назад</a>
+            </div>
+        {{ form_end(postForm) }}
+    </div>
+{% endblock %}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}Форум{% endblock %}</title>
+        {% block stylesheets %}
+            <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+        {% endblock %}
+    </head>
+    <body>
+        <header class="site-header">
+            <div class="container header-row">
+                <a class="site-logo" href="{{ path('app_home') }}">Simple Forum</a>
+
+                <nav class="site-nav">
+                    <a href="{{ path('app_home') }}">Разделы</a>
+
+                    {% if app.user %}
+                        <a href="{{ path('app_profile_my') }}">Профиль</a>
+                    {% endif %}
+
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('app_admin_section_index') }}">Админка</a>
+                    {% endif %}
+                </nav>
+
+                <div class="auth-nav">
+                    {% if app.user %}
+                        <span class="muted-text">{{ app.user.displayName }}</span>
+                        <a class="button button-light" href="{{ path('app_logout') }}">Выйти</a>
+                    {% else %}
+                        <a class="button button-light" href="{{ path('app_login') }}">Войти</a>
+                        <a class="button" href="{{ path('app_register') }}">Регистрация</a>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <main class="page">
+            <div class="container">
+                {% include 'partials/_flashes.html.twig' %}
+                {% block body %}{% endblock %}
+            </div>
+        </main>
+    </body>
+</html>

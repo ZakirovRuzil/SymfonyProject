@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Пост #{{ post.id }}{% endblock %}
+
+{% block body %}
+    <div class="page-head">
+        <div>
+            <p class="breadcrumbs">
+                <a href="{{ path('app_home') }}">Разделы</a>
+                /
+                <a href="{{ path('app_section_show', {id: post.section.id}) }}">{{ post.section.name }}</a>
+            </p>
+            <h1>Пост</h1>
+        </div>
+    </div>
+
+    <article class="card card-large">
+        <div class="card-header">
+            {% include 'partials/_user_badge.html.twig' with {
+                user: post.author,
+                subtitle: 'Опубликовано ' ~ post.createdAt|date('d.m.Y H:i'),
+                size: 'normal'
+            } %}
+
+            {% if post.updatedAt != post.createdAt %}
+                <div class="meta-text">
+                    Обновлено {{ post.updatedAt|date('d.m.Y H:i') }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="post-text">
+            {{ post.text|nl2br }}
+        </div>
+
+        {% if post.images is not empty %}
+            <div class="post-images">
+                {% for image in post.images %}
+                    <a href="{{ asset('uploads/post-images/' ~ image.filename) }}" target="_blank" rel="noreferrer">
+                        <img src="{{ asset('uploads/post-images/' ~ image.filename) }}" alt="{{ image.originalName }}" class="post-image">
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if is_granted('POST_EDIT', post) or is_granted('POST_DELETE', post) %}
+            <div class="card-actions">
+                {% if is_granted('POST_EDIT', post) %}
+                    <a class="button button-light" href="{{ path('app_post_edit', {id: post.id}) }}">Редактировать</a>
+                {% endif %}
+
+                {% if is_granted('POST_DELETE', post) %}
+                    <form method="post" action="{{ path('app_post_delete', {id: post.id}) }}" onsubmit="return confirm('Удалить пост?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_post_' ~ post.id) }}">
+                        <button class="button button-danger" type="submit">Удалить</button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endif %}
+    </article>
+
+    <section class="content-wide">
+        <div class="section-heading">
+            <h2>Комментарии</h2>
+        </div>
+
+        {% if app.user and commentForm %}
+            {{ form_start(commentForm, {attr: {class: 'form-card'}}) }}
+                {{ form_row(commentForm.text) }}
+                <button class="button" type="submit">Добавить комментарий</button>
+            {{ form_end(commentForm) }}
+        {% else %}
+            <div class="empty-state">
+                Чтобы оставить комментарий, войдите в аккаунт.
+            </div>
+        {% endif %}
+
+        {% if post.comments is empty %}
+            <div class="empty-state">
+                Комментариев пока нет.
+            </div>
+        {% else %}
+            <div class="comment-list">
+                {% for comment in post.comments %}
+                    <article class="card comment-card">
+                        {% include 'partials/_user_badge.html.twig' with {
+                            user: comment.author,
+                            subtitle: comment.createdAt|date('d.m.Y H:i'),
+                            size: 'small'
+                        } %}
+
+                        <div class="comment-text">
+                            {{ comment.text|nl2br }}
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

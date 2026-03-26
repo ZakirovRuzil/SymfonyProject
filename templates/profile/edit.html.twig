@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Редактирование профиля{% endblock %}
+
+{% block body %}
+    <div class="content-narrow">
+        <h1>Редактирование профиля</h1>
+
+        {% if profileUser.avatarFilename %}
+            <div class="form-help-block">
+                <div class="meta-label">Текущий аватар</div>
+                <img src="{{ asset('uploads/avatars/' ~ profileUser.avatarFilename) }}" alt="{{ profileUser.displayName }}" class="profile-avatar-preview">
+            </div>
+        {% endif %}
+
+        {{ form_start(profileForm, {attr: {class: 'form-card'}}) }}
+            {{ form_row(profileForm.displayName) }}
+            {{ form_row(profileForm.avatarFile) }}
+
+            <div class="form-actions">
+                <button class="button" type="submit">Сохранить</button>
+                <a class="button button-light" href="{{ path('app_profile_show', {id: profileUser.id}) }}">Назад</a>
+            </div>
+        {{ form_end(profileForm) }}
+    </div>
+{% endblock %}

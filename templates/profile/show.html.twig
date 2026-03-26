@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Профиль {{ profileUser.displayName }}{% endblock %}
+
+{% block body %}
+    <div class="page-head">
+        <div>
+            <h1>Профиль</h1>
+            <p class="page-description">Простая карточка пользователя.</p>
+        </div>
+
+        {% if app.user and app.user.id == profileUser.id %}
+            <a class="button" href="{{ path('app_profile_edit') }}">Редактировать профиль</a>
+        {% endif %}
+    </div>
+
+    <div class="card card-large profile-card">
+        <div class="profile-top">
+            {% include 'partials/_user_badge.html.twig' with {
+                user: profileUser,
+                subtitle: 'Зарегистрирован ' ~ profileUser.createdAt|date('d.m.Y'),
+                size: 'large'
+            } %}
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-value">{{ profileUser.posts|length }}</div>
+                <div class="meta-text">Постов</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">{{ profileUser.comments|length }}</div>
+                <div class="meta-text">Комментариев</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">
+                    {% if 'ROLE_ADMIN' in profileUser.roles %}
+                        Админ
+                    {% elseif 'ROLE_MODERATOR' in profileUser.roles %}
+                        Модератор
+                    {% else %}
+                        Пользователь
+                    {% endif %}
+                </div>
+                <div class="meta-text">Роль</div>
+            </div>
+        </div>
+
+        {% if profileUser.posts is not empty %}
+            <div class="section-heading">
+                <h2>Последние посты</h2>
+            </div>
+
+            <div class="simple-list">
+                {% for post in profileUser.posts|slice(0, 5) %}
+                    <a class="simple-list-item" href="{{ path('app_post_show', {id: post.id}) }}">
+                        <span>{{ post.text|length > 70 ? post.text|slice(0, 70) ~ '…' : post.text }}</span>
+                        <span class="meta-text">{{ post.createdAt|date('d.m.Y H:i') }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ pageTitle }}{% endblock %}
+
+{% block body %}
+    <div class="content-wide">
+        <div class="page-head">
+            <div>
+                <p class="breadcrumbs"><a href="{{ path('app_admin_section_index') }}">Управление разделами</a></p>
+                <h1>{{ pageTitle }}</h1>
+            </div>
+        </div>
+
+        {{ form_start(sectionForm, {attr: {class: 'form-card'}}) }}
+            {{ form_row(sectionForm.name) }}
+            {{ form_row(sectionForm.description) }}
+            {{ form_row(sectionForm.moderators) }}
+
+            <div class="form-actions">
+                <button class="button" type="submit">Сохранить</button>
+                <a class="button button-light" href="{{ path('app_admin_section_index') }}">Назад</a>
+            </div>
+        {{ form_end(sectionForm) }}
+    </div>
+{% endblock %}

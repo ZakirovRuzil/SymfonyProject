@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ section.name }}{% endblock %}
+
+{% block body %}
+    <div class="page-head">
+        <div>
+            <p class="breadcrumbs"><a href="{{ path('app_home') }}">Разделы</a></p>
+            <h1>{{ section.name }}</h1>
+            {% if section.description %}
+                <p class="page-description">{{ section.description }}</p>
+            {% endif %}
+        </div>
+
+        {% if is_granted('ROLE_USER') %}
+            <a class="button" href="{{ path('app_post_new', {id: section.id}) }}">Новый пост</a>
+        {% endif %}
+    </div>
+
+    {% if posts is empty %}
+        <div class="empty-state">
+            В этом разделе пока нет постов.
+        </div>
+    {% else %}
+        <div class="card-list">
+            {% for post in posts %}
+                <article class="card">
+                    <div class="card-header">
+                        {% include 'partials/_user_badge.html.twig' with {
+                            user: post.author,
+                            subtitle: post.createdAt|date('d.m.Y H:i'),
+                            size: 'small'
+                        } %}
+
+                        <div class="meta-text">
+                            Комментариев: {{ post.comments|length }}
+                        </div>
+                    </div>
+
+                    <div class="post-preview">
+                        {{ post.text|length > 240 ? post.text|slice(0, 240) ~ '…' : post.text }}
+                    </div>
+
+                    {% if post.images is not empty %}
+                        <div class="image-strip">
+                            {% for image in post.images %}
+                                <img src="{{ asset('uploads/post-images/' ~ image.filename) }}" alt="{{ image.originalName }}" class="preview-image">
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="card-actions">
+                        <a class="button button-light" href="{{ path('app_post_show', {id: post.id}) }}">Открыть</a>
+
+                        {% if is_granted('POST_EDIT', post) %}
+                            <a class="button button-light" href="{{ path('app_post_edit', {id: post.id}) }}">Редактировать</a>
+                        {% endif %}
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

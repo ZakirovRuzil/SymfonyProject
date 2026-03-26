@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Разделы форума{% endblock %}
+
+{% block body %}
+    <div class="page-head">
+        <div>
+            <h1>Разделы форума</h1>
+            <p class="page-description">Простой список разделов без лишней сложности.</p>
+        </div>
+
+        {% if is_granted('ROLE_ADMIN') %}
+            <a class="button" href="{{ path('app_admin_section_new') }}">Новый раздел</a>
+        {% endif %}
+    </div>
+
+    {% if sections is empty %}
+        <div class="empty-state">
+            Пока нет ни одного раздела.
+        </div>
+    {% else %}
+        <div class="card-list">
+            {% for section in sections %}
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">
+                                <a href="{{ path('app_section_show', {id: section.id}) }}">{{ section.name }}</a>
+                            </h2>
+                            {% if section.description %}
+                                <p class="card-description">{{ section.description }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="meta-text">
+                            Постов: {{ section.posts|length }}
+                        </div>
+                    </div>
+
+                    {% if section.moderators is not empty %}
+                        <div class="meta-block">
+                            <span class="meta-label">Модераторы:</span>
+                            {% for moderator in section.moderators %}
+                                <a href="{{ path('app_profile_show', {id: moderator.id}) }}">{{ moderator.displayName }}</a>{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

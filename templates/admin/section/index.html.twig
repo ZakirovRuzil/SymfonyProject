@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Управление разделами{% endblock %}
+
+{% block body %}
+    <div class="page-head">
+        <div>
+            <h1>Управление разделами</h1>
+            <p class="page-description">Администратор создает разделы и назначает модераторов.</p>
+        </div>
+
+        <a class="button" href="{{ path('app_admin_section_new') }}">Новый раздел</a>
+    </div>
+
+    {% if sections is empty %}
+        <div class="empty-state">
+            Разделов пока нет.
+        </div>
+    {% else %}
+        <div class="card-list">
+            {% for section in sections %}
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">{{ section.name }}</h2>
+                            {% if section.description %}
+                                <p class="card-description">{{ section.description }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="meta-text">
+                            Постов: {{ section.posts|length }}
+                        </div>
+                    </div>
+
+                    <div class="meta-block">
+                        <span class="meta-label">Модераторы:</span>
+                        {% if section.moderators is empty %}
+                            <span class="muted-text">не назначены</span>
+                        {% else %}
+                            {% for moderator in section.moderators %}
+                                <a href="{{ path('app_profile_show', {id: moderator.id}) }}">{{ moderator.displayName }}</a>{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="card-actions">
+                        <a class="button button-light" href="{{ path('app_section_show', {id: section.id}) }}">Открыть</a>
+                        <a class="button button-light" href="{{ path('app_admin_section_edit', {id: section.id}) }}">Редактировать</a>
+
+                        <form method="post" action="{{ path('app_admin_section_delete', {id: section.id}) }}" onsubmit="return confirm('Удалить раздел?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_section_' ~ section.id) }}">
+                            <button class="button button-danger" type="submit">Удалить</button>
+                        </form>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
