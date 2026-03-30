@@ -15,20 +15,27 @@
     </div>
 
     <div class="content-wide">
+        {% if post.id and post.images is not empty %}
+            <div class="form-card form-help-block">
+                <div class="meta-label">Текущие изображения</div>
+                <div class="image-strip">
+                    {% for image in post.images %}
+                        <div class="image-card">
+                            <img src="{{ asset('uploads/post-images/' ~ image.filename) }}" alt="{{ image.originalName }}" class="preview-image">
+
+                            <form method="post" action="{{ path('app_post_image_delete', {post: post.id, image: image.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_post_image_' ~ image.id) }}">
+                                <button class="button button-danger button-small" type="submit">Удалить</button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
         {{ form_start(postForm, {attr: {class: 'form-card'}}) }}
             {{ form_row(postForm.text) }}
             {{ form_row(postForm.imageFiles) }}
-
-            {% if post.id and post.images is not empty %}
-                <div class="form-help-block">
-                    <div class="meta-label">Текущие изображения</div>
-                    <div class="image-strip">
-                        {% for image in post.images %}
-                            <img src="{{ asset('uploads/post-images/' ~ image.filename) }}" alt="{{ image.originalName }}" class="preview-image">
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
 
             <div class="form-actions">
                 <button class="button" type="submit">Сохранить</button>

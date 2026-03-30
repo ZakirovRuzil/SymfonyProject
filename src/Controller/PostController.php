@@ -135,6 +135,33 @@ class PostController extends AbstractController
         return $this->redirectToRoute('app_section_show', ['id' => $sectionId]);
     }
 
+    #[Route('/posts/{post}/images/{image}/delete', name: 'app_post_image_delete', methods: ['POST'])]
+    #[IsGranted(attribute: PostVoter::EDIT, subject: 'post')]
+    public function deleteImage(
+        Post $post,
+        PostImage $image,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        FileUploader $fileUploader,
+    ): Response {
+        if ($image->getPost()?->getId() !== $post->getId()) {
+            throw $this->createNotFoundException('Изображение не относится к этому посту.');
+        }
+
+        if ($this->isCsrfTokenValid('delete_post_image_'.$image->getId(), (string) $request->request->get('_token'))) {
+            $fileUploader->delete($image->getFilename(), $this->getParameter('post_images_directory'));
+            $post->removeImage($image);
+            $post->setUpdatedAt(new \DateTimeImmutable());
+
+            $entityManager->remove($image);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Изображение удалено.');
+        }
+
+        return $this->redirectToRoute('app_post_edit', ['id' => $post->getId()]);
+    }
+
     /**
      * @param iterable<UploadedFile> $uploadedFiles
      */
